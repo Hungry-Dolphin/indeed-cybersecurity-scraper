@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Index{% endblock %}
+{% block header %}
+This is the index page
+{% endblock %}
+
+{% block content %}
+  <ul>
+    {% for x in range(5) %}
+      <li>{{ x }}</li>
+      {% if not loop.last %}
+        something
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endblock %}

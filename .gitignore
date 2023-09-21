@@ -1,4 +1,9 @@
-/venv
+venv
 *.pyc
 instance/
 .idea
+.coverage
+htmlcov
+.pytest_cache
+
+notes.md
