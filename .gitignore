@@ -5,5 +5,4 @@ instance/
 .coverage
 htmlcov
 .pytest_cache
-
-notes.md
+experimental

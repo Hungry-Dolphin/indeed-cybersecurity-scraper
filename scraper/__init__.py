@@ -26,6 +26,7 @@ def create_app(test_config=None):
         pass
 
     db.init_app(app)
+    app.logger.debug('Registering blueprints')
     app.register_blueprint(auth.bp)
     app.register_blueprint(scraper.bp)
     app.add_url_rule('/', endpoint='index')
