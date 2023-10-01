@@ -6,6 +6,9 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium_stealth import stealth
 from fake_useragent import UserAgent
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class WebScraper:
@@ -20,15 +23,14 @@ class WebScraper:
         # To avoid bot detections
         self.options.add_experimental_option("excludeSwitches", ["enable-automation"])
         self.options.add_experimental_option('useAutomationExtension', False)
-        ua = UserAgent()
+        ua = UserAgent(os='windows')
         user_agent = ua.random
         self.options.add_argument(f'user-agent={user_agent}')
 
-    def fetch_page_content(self, url):
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.options)
+        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.options)
 
         stealth(
-            driver,
+            self.driver,
             languages=["en-US", "en"],
             vendor="Google Inc.",
             platform="Win32",
@@ -37,10 +39,11 @@ class WebScraper:
             fix_hairline=True,
         )
 
-        driver.get(url)
+    def fetch_page_content(self, url):
+        self.driver.get(url)
         time.sleep(3)
-        result = driver.page_source
-        driver.close()
+        result = self.driver.page_source
+
         return result
 
     def split_content_into_jobs(self, content):
@@ -56,13 +59,25 @@ class WebScraper:
             if not company:
                 continue
 
+            # Get the job name
+            title = job_soup.find('span')
+
+            # Find the link to click to expand the job info
+            link = self.driver.find_element(By.PARTIAL_LINK_TEXT, f'{str(title.text).strip()}')
+            action = ActionChains(self.driver)
+            action.click(on_element=link)
+            action.perform()
+            # print(f"Clicked on job {str(title.text).strip()}")
+            time.sleep(5)
+
             # Just save it as raw HTML for now, we can run a separate translation function on it later
-            job_list.append(job_html.prettify())
+            job_list.append(self.driver.page_source)
 
         return job_list
 
     def main(self):
         content = self.fetch_page_content(f'{self.__BASE_URL}')
         html_jobs = self.split_content_into_jobs(content)
+        self.driver.close()
         return html_jobs
 

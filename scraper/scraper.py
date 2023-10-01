@@ -10,14 +10,7 @@ from scraper import fetch_data
 bp = Blueprint('scraper', __name__)
 
 
-@bp.route('/')
-def index():
-    return render_template('scraper/index.html')
-
-
-@bp.route('/request')
-def request():
-    # TODO make a json file which you can edit from the webserver which contains all the settings
+async def scrape():
     site = "https://nl.indeed.com/jobs?q=cyber+security&l=Nederland&fromage=1"
     job_data = fetch_data.WebScraper(f"{site}").main()
     db = get_db()
@@ -31,5 +24,16 @@ def request():
         except db.IntegrityError:
             error = f"Error while adding jobs to the database"
             flash(error)
+
+
+@bp.route('/')
+def index():
+    return render_template('scraper/index.html')
+
+
+@bp.route('/request')
+def request():
+    # TODO make a json file which you can edit from the webserver which contains all the settings
+    scrape()
 
     return render_template('scraper/request.html')

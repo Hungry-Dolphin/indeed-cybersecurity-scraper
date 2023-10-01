@@ -38,3 +38,4 @@ Because I don't feel like having to drop into a Docker shell every time I want t
 # TODO's later
 - Don't just copy the entire workdir in the dockerfile
 - Find a less bloated Docker image to use
+- If more jobs are posted than are allowed to be on a single page. We don't scroll to the next page
